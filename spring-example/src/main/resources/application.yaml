@@ -9,6 +9,7 @@ keycloak:
   # client-secret: defined in deployment-specific application-<>.yaml
   admin:
     client-id: admin-cli
+    client-secret: ${keycloak.client-secret}
 
 spring:
   application:
