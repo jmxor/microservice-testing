@@ -1,3 +1,54 @@
+server:
+  port: 8081
+
+keycloak:
+  auth-server-url: http://localhost:7080
+  realm: spring-boot-demo
+  client-id: spring-boot-app
+  client-secret: Z1MnzRu0CGWNJcxob1sbxhfbHhyN66Y5
+  # client-secret: defined in deployment-specific application-<>.yaml
+  admin:
+    client-id: admin-cli
+
 spring:
   application:
     name: spring-example
+
+  security:
+    oauth2:
+      # Resource server configuration for API protection
+      resource-server:
+        jwt:
+          # Keycloak's issuer URI - Spring fetched OIDC config from here
+          issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}
+          # JWK Set URI for token signature verification
+          jwk-set-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/certs
+
+      # Client configuration for OAuth2 login
+      client:
+        registration:
+          keycloak:
+            client-id: ${keycloak.client-id}
+            client-secret: ${keycloak.admin.client-secret}
+            scope: openid,profile,email,roles
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          keycloak:
+            issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}
+            user-name-attribute: preferred_username
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+  security:
+    public-paths:
+      - /api/public/**
+      - /actuator/health
+      - /swagger-ui/**
+      - /v3/api-docs/**
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
