@@ -23,9 +23,17 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final SecurityProperties securityProperties;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public SecurityConfig(SecurityProperties securityProperties) {
+    public SecurityConfig(
+        SecurityProperties securityProperties,
+        CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+        CustomAccessDeniedHandler customAccessDeniedHandler
+    ) {
         this.securityProperties = securityProperties;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     /**
@@ -68,8 +76,8 @@ public class SecurityConfig {
 
             // Custom error handlers
             .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                .accessDeniedHandler(new CustomAccessDeniedHandler())
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler)
             )
 
             // Add security headers
