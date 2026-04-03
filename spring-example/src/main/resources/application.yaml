@@ -40,9 +40,9 @@ spring:
             user-name-attribute: preferred_username
 
 app:
-  cors:
-    allowed-origins: http://localhost:3000
   security:
+    cors-allowed-origins:
+      - http://localhost:3000
     public-paths:
       - /api/public/**
       - /actuator/health

@@ -1,6 +1,5 @@
 package org.jmxor.springExample.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -8,6 +7,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * CORS configuration for cross-origin requests.
@@ -15,8 +15,11 @@ import java.util.Arrays;
  */
 @Configuration
 public class CorsConfig {
-    @Value("${app.cors.allowed-origins}")
-    private String allowedOrigins;
+    private final SecurityProperties securityProperties;
+
+    public CorsConfig(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+    }
 
     /**
      * Configures CORS settings for the application.
@@ -24,10 +27,11 @@ public class CorsConfig {
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        List<String> corsAllowedOrigins = securityProperties.getCorsAllowedOrigins();
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Allow specified origins
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        configuration.setAllowedOrigins(corsAllowedOrigins);
 
         // Allow common HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));

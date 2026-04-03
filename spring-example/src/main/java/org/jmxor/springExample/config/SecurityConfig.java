@@ -10,6 +10,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.List;
+
 /**
  * Security configuration for Keycloak integration.
  * Configures JWT validation, role extraction, and endpoint protection.
@@ -18,13 +20,19 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    private final SecurityProperties securityProperties;
+
+    public SecurityConfig(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+    }
 
     /**
      * Main security filter chain configuration
      * Sets up OAuth2 resource server with JWT support.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        List<String> publicPaths = securityProperties.getPublicPaths();
         http
                 // Disable CSRF for stateless APIs
                 .csrf(AbstractHttpConfigurer::disable)
@@ -35,12 +43,9 @@ public class SecurityConfig {
                 )
 
                 // Configure endpoint authorization
-                // TODO: get public endpoint to authorize from the configuration.
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints - no authentication required
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(publicPaths.toArray(String[]::new)).permitAll()
 
                         // Admin endpoints require admin role
                         .requestMatchers("/api/admin/**").hasRole("admin")
