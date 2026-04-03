@@ -39,7 +39,9 @@ public class JwtConfig {
                 JwtValidators.createDefaultWithIssuer(issuerUri),
 
                 // Add a custom audience validator
-                new AudienceValidator("spring-boot-app", "account"),
+                // Determine if it is possible to remove the 'test-client' audience from the main
+                // audience validator without breaking the KeycloakIntegrationTest
+                new AudienceValidator("spring-boot-app", "account", "test-client"),
 
                 // Add timestamp validator with clock skew tolerance
                 new JwtTimestampValidator(Duration.ofSeconds(60))
