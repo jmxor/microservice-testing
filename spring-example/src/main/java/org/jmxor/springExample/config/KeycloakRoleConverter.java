@@ -17,7 +17,7 @@ public class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedA
     private static final String ROLE_PREFIX = "ROLE_";
 
     // CLient ID for extracting client-specific roles
-    @Value( "${spring.security.oauth2.resourceserver.client-id}")
+    @Value( "${spring.security.oauth2.resource-server.client-id}")
     private static String CLIENT_ID;
 
     @Override
