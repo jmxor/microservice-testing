@@ -21,9 +21,6 @@ public class JwtConfig {
     @Value("${spring.security.oauth2.resource-server.jwt.issuer-uri}")
     private String issuerUri;
 
-    @Value("${spring.security.oauth2.resource-server.jwt.jwk-set-uri}")
-    private String jwkSetUri;
-
     public JwtConfig(SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
     }
@@ -36,21 +33,16 @@ public class JwtConfig {
     public JwtDecoder jwtDecoder() {
         List<String> jwtAllowedAudiences = securityProperties.jwtAllowedAudiences();
 
-        // Create decoder from JWK Set URI
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
-                .withJwkSetUri(jwkSetUri)
-                .build();
+        // Create decoder from Issuer URI
+        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
 
         // Combine multiple validators
         OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(
-                // Validate issuer matches expected value
-                JwtValidators.createDefaultWithIssuer(issuerUri),
+            // Add a custom audience validator
+            new AudienceValidator(jwtAllowedAudiences.toArray(String[]::new)),
 
-                // Add a custom audience validator
-                new AudienceValidator(jwtAllowedAudiences.toArray(String[]::new)),
-
-                // Add timestamp validator with clock skew tolerance
-                new JwtTimestampValidator(Duration.ofSeconds(60))
+            // Add timestamp validator with clock skew tolerance
+            new JwtTimestampValidator(Duration.ofSeconds(60))
         );
 
         jwtDecoder.setJwtValidator(validator);
