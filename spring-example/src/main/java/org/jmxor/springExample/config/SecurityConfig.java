@@ -6,9 +6,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 
 import java.util.List;
 
@@ -34,41 +36,52 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         List<String> publicPaths = securityProperties.getPublicPaths();
         http
-                // Disable CSRF for stateless APIs
-                .csrf(AbstractHttpConfigurer::disable)
+            // Disable CSRF for stateless APIs
+            .csrf(AbstractHttpConfigurer::disable)
 
-                // Use stateless sessions - no server-side session storage
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            // Use stateless sessions - no server-side session storage
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+
+            // Configure endpoint authorization
+            .authorizeHttpRequests(auth -> auth
+                // Public endpoints - no authentication required
+                .requestMatchers(publicPaths.toArray(String[]::new)).permitAll()
+
+                // Admin endpoints require admin role
+                .requestMatchers("/api/admin/**").hasRole("admin")
+
+                // User endpoints require user or admin role
+                .requestMatchers("/api/user/**").hasAnyRole("user", "admin")
+
+                // All other requests require authentication
+                .anyRequest().authenticated()
+            )
+
+            // Configure Oauth2 resource server with JWT
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
+            )
 
-                // Configure endpoint authorization
-                .authorizeHttpRequests(auth -> auth
-                        // Public endpoints - no authentication required
-                        .requestMatchers(publicPaths.toArray(String[]::new)).permitAll()
+            // Custom error handlers
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler())
+            )
 
-                        // Admin endpoints require admin role
-                        .requestMatchers("/api/admin/**").hasRole("admin")
-
-                        // User endpoints require user or admin role
-                        .requestMatchers("/api/user/**").hasAnyRole("user", "admin")
-
-                        // All other requests require authentication
-                        .anyRequest().authenticated()
+            // Add security headers
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp ->
+                    csp.policyDirectives("default-src 'self'")
                 )
-
-                // Configure Oauth2 resource server with JWT
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                .xssProtection(xss -> xss
+                    .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
                 )
-
-                // Custom error handlers
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                        .accessDeniedHandler(new CustomAccessDeniedHandler())
-                );
+            );
 
         return http.build();
     }
