@@ -48,6 +48,10 @@ app:
       - /actuator/health
       - /swagger-ui/**
       - /v3/api-docs/**
+    jwt-allowed-audiences:
+      - spring-boot-app
+      - account
+      - test-client
 
 logging:
   level:

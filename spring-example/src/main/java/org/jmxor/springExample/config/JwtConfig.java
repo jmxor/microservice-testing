@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Custom JWT decoder configuration.
@@ -15,6 +16,7 @@ import java.time.Duration;
  */
 @Configuration
 public class JwtConfig {
+    private final SecurityProperties securityProperties;
 
     @Value("${spring.security.oauth2.resource-server.jwt.issuer-uri}")
     private String issuerUri;
@@ -22,12 +24,18 @@ public class JwtConfig {
     @Value("${spring.security.oauth2.resource-server.jwt.jwk-set-uri}")
     private String jwkSetUri;
 
+    public JwtConfig(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+    }
+
     /**
      * Creates a custom JWT decoder with additional validators.
      * Validates issuer, audience, and adds clock skew tolerance.
      */
     @Bean
     public JwtDecoder jwtDecoder() {
+        List<String> jwtAllowedAudiences = securityProperties.jwtAllowedAudiences();
+
         // Create decoder from JWK Set URI
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
                 .withJwkSetUri(jwkSetUri)
@@ -39,9 +47,7 @@ public class JwtConfig {
                 JwtValidators.createDefaultWithIssuer(issuerUri),
 
                 // Add a custom audience validator
-                // Determine if it is possible to remove the 'test-client' audience from the main
-                // audience validator without breaking the KeycloakIntegrationTest
-                new AudienceValidator("spring-boot-app", "account", "test-client"),
+                new AudienceValidator(jwtAllowedAudiences.toArray(String[]::new)),
 
                 // Add timestamp validator with clock skew tolerance
                 new JwtTimestampValidator(Duration.ofSeconds(60))

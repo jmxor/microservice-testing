@@ -34,7 +34,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        List<String> publicPaths = securityProperties.getPublicPaths();
+        List<String> publicPaths = securityProperties.publicPaths();
         http
             // Disable CSRF for stateless APIs
             .csrf(AbstractHttpConfigurer::disable)
