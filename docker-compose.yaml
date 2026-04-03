@@ -1,6 +1,6 @@
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:26.5.5
     environment:
       KC_HOSTNAME: http://localhost:7080
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
