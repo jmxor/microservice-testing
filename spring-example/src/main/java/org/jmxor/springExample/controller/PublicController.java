@@ -15,17 +15,6 @@ import java.util.Map;
 @RequestMapping("/api/public")
 public class PublicController {
     /**
-     * Health check endpoint - useful for load balancers and monitoring.
-     */
-    @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> health() {
-        return ResponseEntity.ok(Map.of(
-                "status", "UP",
-                "message", "Application is running"
-        ));
-    }
-
-    /**
      * Public information endpoint - no authentication needed.
      */
     @GetMapping("/info")
