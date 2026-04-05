@@ -5,8 +5,27 @@ import ToolingIcon from './icons/IconTooling.vue'
 import EcosystemIcon from './icons/IconEcosystem.vue'
 import CommunityIcon from './icons/IconCommunity.vue'
 import SupportIcon from './icons/IconSupport.vue'
+import { onMounted, ref } from "vue";
+import { getToken } from "@josempgon/vue-keycloak";
 
 const openReadmeInEditor = () => fetch('/__open-in-editor?file=README.md')
+const apiResponse = ref<string>('');
+
+onMounted(async () => {
+  try {
+    const token = await getToken()
+    const response = await fetch('http://localhost:8081/api/user/profile', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const json = await response.json();
+    apiResponse.value = JSON.stringify(json, null, 2);
+  } catch (error) {
+    apiResponse.value = `Error fetching API: ${error}`;
+  }
+})
 </script>
 
 <template>
@@ -91,5 +110,17 @@ const openReadmeInEditor = () => fetch('/__open-in-editor?file=README.md')
     As an independent project, Vue relies on community backing for its sustainability. You can help
     us by
     <a href="https://vuejs.org/sponsor/" target="_blank" rel="noopener">becoming a sponsor</a>.
+  </WelcomeItem>
+
+  <WelcomeItem>
+    <template #icon>
+      {json}
+    </template>
+
+    <template #heading>
+      API response
+    </template>
+
+    <pre>{{ apiResponse }}</pre>
   </WelcomeItem>
 </template>
