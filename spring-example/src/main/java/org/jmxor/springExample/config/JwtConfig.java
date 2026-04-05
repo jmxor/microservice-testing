@@ -33,7 +33,7 @@ public class JwtConfig {
     public JwtDecoder jwtDecoder() {
         List<String> jwtAllowedAudiences = securityProperties.jwtAllowedAudiences();
 
-        // Create decoder from Issuer URI
+        // Create decoder from Issuer URI (automatically includes issuer validation)
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
 
         // Combine multiple validators

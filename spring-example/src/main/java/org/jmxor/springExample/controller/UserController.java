@@ -28,7 +28,7 @@ public class UserController {
     @GetMapping("/profile")
     @PreAuthorize("hasAnyRole('user', 'admin')")
     public ResponseEntity<Map<String, Object>> getProfile(
-            @AuthenticationPrincipal Jwt jwt) {
+        @AuthenticationPrincipal Jwt jwt) {
 
         Map<String, Object> profile = new HashMap<>();
 
@@ -55,9 +55,8 @@ public class UserController {
      */
     @GetMapping("/roles")
     @PreAuthorize("hasAnyRole('user', 'admin')")
-    @SuppressWarnings("unchecked")
     public ResponseEntity<Map<String, Object>> getRoles(
-            @AuthenticationPrincipal Jwt jwt) {
+        @AuthenticationPrincipal Jwt jwt) {
 
         Map<String, Object> roles = new HashMap<>();
 
@@ -83,14 +82,14 @@ public class UserController {
     @GetMapping("/data")
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<Map<String, Object>> getUserData(
-            @AuthenticationPrincipal Jwt jwt) {
+        @AuthenticationPrincipal Jwt jwt) {
 
         String username = jwt.getClaimAsString("preferred_username");
 
         return ResponseEntity.ok(Map.of(
-                "message", "Hello, " + username + "!",
-                "data", "This is user-specific data",
-                "accessLevel", "user"
+            "message", "Hello, " + username + "!",
+            "data", "This is user-specific data",
+            "accessLevel", "user"
         ));
     }
 }

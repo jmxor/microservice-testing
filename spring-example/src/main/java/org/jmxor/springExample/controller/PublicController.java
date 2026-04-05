@@ -20,9 +20,9 @@ public class PublicController {
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> info() {
         return ResponseEntity.ok(Map.of(
-                "application", "Keycloak Spring Boot Demo",
-                "version", "1.0.0",
-                "authentication", "Keycloak OAuth2/OIDC"
+            "application", "Keycloak Spring Boot Demo",
+            "version", "1.0.0",
+            "authentication", "Keycloak OAuth2/OIDC"
         ));
     }
 }
