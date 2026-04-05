@@ -2,13 +2,31 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { vueKeycloak } from "@josempgon/vue-keycloak";
 
 import App from './App.vue'
-import router from './router'
+import initRouter from './router'
 
-const app = createApp(App)
+const initApp = async () => {
 
-app.use(createPinia())
-app.use(router)
+  const app = createApp(App)
 
-app.mount('#app')
+  // Initialize vue-keycloak
+  await vueKeycloak.install(app,
+    {
+      config: {
+        url: 'http://localhost:7080',
+        realm: 'microservices-example',
+        clientId: 'vue-example',
+      }
+    }
+  )
+  const router = initRouter()
+
+  app.use(createPinia())
+  app.use(router)
+  app.mount('#app')
+}
+
+initApp()
+

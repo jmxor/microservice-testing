@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
-const router = createRouter({
+// Init router function to allow router to be initialized after keycloak is initialized
+const initRouter = () => createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
@@ -20,4 +21,4 @@ const router = createRouter({
   ],
 })
 
-export default router
+export default initRouter
