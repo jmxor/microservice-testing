@@ -5,8 +5,6 @@ microservices in that is as close as possible to a production deployment
 environment while still being fully locally hosted. This should include full
 CORS and SSL setup for each service and OAuth2 authentication with Keycloak.
 
-The example app is based on [this blog post](https://oneuptime.com/blog/post/2026-02-02-keycloak-spring-boot/view).
-
 ## Keycloak setup
 
 Start the keycloak container from the docker compose file and access the admin
@@ -44,6 +42,11 @@ docker compose up -d
 
 1. Create a new realm with the name `test-realm`.
 2. Create a new client with the name `test-client`.
-3. Set Valid Redirect URIs to `http://localhost:*` as the test keycloak port changes every time.
+3. Set Valid Redirect URIs to `http://localhost:*` as the spring testcontainer keycloak port changes every time.
 4. Set Web origins to `http://localhost:*` for the same reason.
 5. Create the same roles as above.
+
+### References
+
+- Spring boot & keycloak integration example: https://oneuptime.com/blog/post/2026-02-02-keycloak-spring-boot/view
+- Spring HATEOAS example: https://spring.io/guides/tutorials/rest
