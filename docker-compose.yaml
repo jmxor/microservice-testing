@@ -19,6 +19,14 @@ services:
     networks:
       - local-network
 
+  blog-db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+
 networks:
   local-network:
     driver: bridge

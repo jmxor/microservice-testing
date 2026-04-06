@@ -1,4 +1,4 @@
-package org.jmxor.springExample.controller;
+package org.jmxor.springExample.user;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +18,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     /**
      * Returns the profile of the currently authenticated user.
@@ -31,6 +36,9 @@ public class UserController {
         @AuthenticationPrincipal Jwt jwt) {
 
         Map<String, Object> profile = new HashMap<>();
+
+        User user = userService.getOrCreateUser(jwt);
+        profile.put("userId", user.getId().toString());
 
         // Standard claims
         profile.put("subject", jwt.getSubject());
