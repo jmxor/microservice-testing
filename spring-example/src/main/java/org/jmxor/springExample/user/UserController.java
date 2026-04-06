@@ -1,4 +1,4 @@
-package org.jmxor.springExample.controller;
+package org.jmxor.springExample.user;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
